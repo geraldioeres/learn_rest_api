@@ -5,13 +5,16 @@ import (
 	"strconv"
 
 	"github.com/labstack/echo/v4"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 )
 
 type User struct {
-	Id      int    `json:"id"`
-	Name    string `json:"name"`
-	Email   string `json:"email"`
-	Address string `json:"address"`
+	Id       int    `gorm:"primaryKey" json:"id"`
+	Name     string `json:"name"`
+	Email    string `json:"email"`
+	Address  string `json:"address"`
+	Password string `json:"password"`
 }
 
 type UserLogin struct {
@@ -25,7 +28,24 @@ type BaseResponse struct {
 	Data    interface{}
 }
 
+var DB *gorm.DB
+
+func InitDB() {
+	dsn := "root:diosql@tcp(127.0.0.1:3306)/learn_api"
+	var err error
+	DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	if err != nil {
+		panic("DB failed to connect")
+	}
+	Migration()
+}
+
+func Migration() {
+	DB.AutoMigrate(&User{})
+}
+
 func main() {
+	InitDB()
 	e := echo.New()
 	eV1 := e.Group("v1/")
 	eV1.GET("users", GetUserController)
@@ -69,9 +89,9 @@ func GetUserController(c echo.Context) error {
 	user := User{}
 
 	if name == "" {
-		user = User{1, "Alterra", "alterrra@gmail.com", "malang"}
+		user = User{1, "Alterra", "alterrra@gmail.com", "malang", ""}
 	} else {
-		user = User{1, name, "alterrra@gmail.com", address}
+		user = User{1, name, "alterrra@gmail.com", address, ""}
 	}
 
 	return c.JSON(http.StatusOK, BaseResponse{
