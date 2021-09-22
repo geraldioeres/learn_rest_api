@@ -24,8 +24,21 @@ func main() {
 	e := echo.New()
 	eV1 := e.Group("v1/")
 	eV1.GET("users", GetUserController)
+	eV1.POST("users/login", LoginController)
 	eV1.GET("users/:userId", DetailUserController)
 	e.Start(":8000")
+}
+
+func LoginController(c echo.Context) error {
+	email := c.FormValue("email")
+	password := c.FormValue("password")
+
+	return c.JSON(http.StatusOK, BaseResponse{
+		Code:    http.StatusOK,
+		Message: "Berhasil",
+		Data:    User{Id: 1, Email: email, Address: password},
+	})
+
 }
 
 func DetailUserController(c echo.Context) error {
