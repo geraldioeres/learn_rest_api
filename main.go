@@ -1,47 +1,35 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
-	"io/ioutil"
 	"net/http"
+
+	"github.com/labstack/echo/v4"
 )
 
 type User struct {
-	Name    string
-	Email   string
-	Address string
+	Name    string `json:"name"`
+	Email   string `json:"email"`
+	Address string `json:"address"`
 }
 
-type PeopleSwapi struct {
-	Name   string `json:"name"`
-	Height string `json:"height"`
-	Mass   string `json:"mass"`
+type BaseResponse struct {
+	Code    int
+	Message string
+	Data    interface{}
 }
 
 func main() {
-	http.HandleFunc("/v1/users", GetUserController)
-	fmt.Println("Server API telah berjalan di port 8000")
-	http.ListenAndServe(":8000", nil)
+	e := echo.New()
+
+	e.GET("v1/users", GetUserController)
+	e.Start(":8000")
 }
 
-func GetUserController(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "GET" {
-		response, _ := http.Get("https://swapi.dev/api/people/1/")
-		responseBody, _ := ioutil.ReadAll(response.Body)
-		defer response.Body.Close()
-
-		peopleSwapi := PeopleSwapi{}
-		json.Unmarshal(responseBody, &peopleSwapi)
-
-		user := User{peopleSwapi.Name, peopleSwapi.Mass, peopleSwapi.Height}
-		resultJSON, err := json.Marshal(user)
-		if err != nil {
-			http.Error(w, "Gagal Convert", http.StatusInternalServerError)
-			return
-		}
-		w.Write(resultJSON)
-		return
-	}
-	http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+func GetUserController(c echo.Context) error {
+	user := User{"Alterra", "alterrra@gmail.com", "malang"}
+	return c.JSON(http.StatusOK, BaseResponse{
+		Code: http.StatusOK,
+		Message: "Berhasil",
+		Data: user,
+	})
 }
