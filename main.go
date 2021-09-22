@@ -45,7 +45,17 @@ func DetailUserController(c echo.Context) error {
 }
 
 func GetUserController(c echo.Context) error {
-	user := User{1, "Alterra", "alterrra@gmail.com", "malang"}
+	name := c.QueryParam("name")
+	address := c.QueryParam("address")
+	// bisnis
+	user := User{}
+
+	if name == "" {
+		user = User{1, "Alterra", "alterrra@gmail.com", "malang"}
+	} else {
+		user = User{1, name, "alterrra@gmail.com", address}
+	}
+
 	return c.JSON(http.StatusOK, BaseResponse{
 		Code:    http.StatusOK,
 		Message: "Berhasil",
