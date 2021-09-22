@@ -14,6 +14,11 @@ type User struct {
 	Address string `json:"address"`
 }
 
+type UserLogin struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
 type BaseResponse struct {
 	Code    int
 	Message string
@@ -30,13 +35,13 @@ func main() {
 }
 
 func LoginController(c echo.Context) error {
-	email := c.FormValue("email")
-	password := c.FormValue("password")
+	userLogin := UserLogin{}
+	c.Bind(&userLogin)
 
 	return c.JSON(http.StatusOK, BaseResponse{
 		Code:    http.StatusOK,
 		Message: "Berhasil",
-		Data:    User{Id: 1, Email: email, Address: password},
+		Data:    userLogin,
 	})
 
 }
