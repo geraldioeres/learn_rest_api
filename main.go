@@ -42,7 +42,7 @@ type BaseResponse struct {
 var DB *gorm.DB
 
 func InitDB() {
-	dsn := "root:diosql@tcp(127.0.0.1:3306)/learn_api"
+	dsn := "root:diosql@tcp(127.0.0.1:3306)/learn_api?charset=utf8mb4&parseTime=True&loc=Local"
 	var err error
 	DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
@@ -131,20 +131,23 @@ func DetailUserController(c echo.Context) error {
 }
 
 func GetUserController(c echo.Context) error {
-	// name := c.QueryParam("name")
-	// address := c.QueryParam("address")
-	// bisnis
-	user := User{}
+	users := []User{}
 
-	// if name == "" {
-	// 	user = User{1, "Alterra", "alterrra@gmail.com", "malang", ""}
-	// } else {
-	// 	user = User{1, name, "alterrra@gmail.com", address, ""}
-	// }
+	result := DB.Find(&users)
+
+	if result.Error != nil {
+		if result.Error != gorm.ErrRecordNotFound {
+			return c.JSON(http.StatusInternalServerError, BaseResponse{
+				Code:    http.StatusInternalServerError,
+				Message: "Error ketika mendapatkan data user dari DB",
+				Data:    nil,
+			})
+		}
+	}
 
 	return c.JSON(http.StatusOK, BaseResponse{
 		Code:    http.StatusOK,
-		Message: "Berhasil",
-		Data:    user,
+		Message: "Berhasil mendapatkan data user",
+		Data:    users,
 	})
 }
