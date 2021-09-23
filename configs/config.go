@@ -1,10 +1,13 @@
 package configs
 
 import (
+	"learn_api/models/twitters"
 	"learn_api/models/users"
+
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
+
 var DB *gorm.DB
 
 func InitDB() {
@@ -18,5 +21,5 @@ func InitDB() {
 }
 
 func Migration() {
-	DB.AutoMigrate(&users.User{})
+	DB.AutoMigrate(&users.User{}, &twitters.Tweet{})
 }

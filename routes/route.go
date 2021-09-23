@@ -2,6 +2,7 @@ package routes
 
 import (
 	"learn_api/controllers"
+	"learn_api/controllers/twitters"
 
 	"github.com/labstack/echo/v4"
 )
@@ -13,6 +14,7 @@ func NewRoutes() *echo.Echo {
 	eV1.POST("users/login", controllers.LoginController)
 	eV1.POST("users/register", controllers.RegisterController)
 	eV1.GET("users/:userId", controllers.DetailUserController)
-	e.Start(":8000")
+
+	eV1.GET("tweet", twitters.GetTwitterController)
 	return e
 }
