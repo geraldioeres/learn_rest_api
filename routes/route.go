@@ -16,5 +16,9 @@ func NewRoutes() *echo.Echo {
 	eV1.GET("users/:userId", controllers.DetailUserController)
 
 	eV1.GET("tweet", twitters.GetTwitterController)
+
+	eV1.POST("wish", controllers.WishRegister)
+	eV1.POST("products", controllers.ProductRegister)
+	eV1.GET("get", controllers.GetWish)
 	return e
 }

@@ -1,8 +1,10 @@
 package configs
 
 import (
+	"learn_api/models/product"
 	"learn_api/models/twitters"
 	"learn_api/models/users"
+	"learn_api/models/wish"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -21,5 +23,5 @@ func InitDB() {
 }
 
 func Migration() {
-	DB.AutoMigrate(&users.User{}, &twitters.Tweet{})
+	DB.AutoMigrate(&users.User{}, &twitters.Tweet{}, &wish.Wish{}, &product.Product{})
 }
