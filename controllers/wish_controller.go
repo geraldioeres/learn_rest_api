@@ -11,6 +11,28 @@ import (
 	"gorm.io/gorm"
 )
 
+func GetProduct(c echo.Context) error {
+	product := []product.Product{}
+
+	result := configs.DB.Preload("Wish").Find(&product)
+
+	if result.Error != nil {
+		if result.Error != gorm.ErrRecordNotFound {
+			return c.JSON(http.StatusInternalServerError, response.BaseResponse{
+				Code:    http.StatusInternalServerError,
+				Message: "Error ketika mendapatkan data twitter dari DB",
+				Data:    nil,
+			})
+		}
+	}
+
+	return c.JSON(http.StatusOK, response.BaseResponse{
+		Code:    http.StatusOK,
+		Message: "Berhasil mendapatkan data twitter",
+		Data:    result,
+	})
+}
+
 func GetWish(c echo.Context) error {
 	wish := []wish.Wish{}
 

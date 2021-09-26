@@ -20,5 +20,6 @@ func NewRoutes() *echo.Echo {
 	eV1.POST("wish", controllers.WishRegister)
 	eV1.POST("products", controllers.ProductRegister)
 	eV1.GET("get", controllers.GetWish)
+	eV1.GET("products", controllers.GetProduct)
 	return e
 }
