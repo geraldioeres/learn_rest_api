@@ -1,7 +1,9 @@
 package controllers
 
 import (
+	"errors"
 	"learn_api/configs"
+	"learn_api/middlewares"
 	"learn_api/models/response"
 	"learn_api/models/users"
 	"net/http"
@@ -27,7 +29,7 @@ func RegisterController(c echo.Context) error {
 
 	var userDB users.User
 	userDB.Name = userRegister.Name
-	userDB.Password = userRegister.Password
+	// userDB.Password = helpers.Hash(userRegister.Password)
 	userDB.Address = userRegister.Address
 	userDB.Email = userRegister.Email
 
@@ -51,10 +53,50 @@ func LoginController(c echo.Context) error {
 	userLogin := users.UserLogin{}
 	c.Bind(&userLogin)
 
+	user := users.User{}
+
+	result := configs.DB.First(&user, "email = ? AND password = ?", userLogin.Email, userLogin.Password)
+
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return c.JSON(http.StatusForbidden, response.BaseResponse{
+				Code:    http.StatusForbidden,
+				Message: "User tidak ditemukan atau password tidak sesuai",
+				Data:    nil,
+			})
+		} else {
+			return c.JSON(http.StatusInternalServerError, response.BaseResponse{
+				Code:    http.StatusInternalServerError,
+				Message: "Ada kesalahan pada server",
+				Data:    nil,
+			})
+		}
+	}
+
+	token, err := middlewares.GenerateTokenJWT(user.Id)
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, response.BaseResponse{
+			Code:    http.StatusInternalServerError,
+			Message: "Ada kesalahan pada server",
+			Data:    nil,
+		})
+	}
+
+	userResponse := users.UserResponse{
+		Id:        user.Id,
+		Name:      user.Name,
+		Email:     user.Email,
+		Address:   user.Address,
+		Token:     token,
+		CreatedAt: user.CreatedAt,
+		UpdatedAt: user.UpdatedAt,
+	}
+
 	return c.JSON(http.StatusOK, response.BaseResponse{
 		Code:    http.StatusOK,
-		Message: "Berhasil",
-		Data:    userLogin,
+		Message: "Berhasil login",
+		Data:    userResponse,
 	})
 
 }
@@ -90,8 +132,10 @@ func GetUserController(c echo.Context) error {
 		}
 	}
 
+	userId := middlewares.GetClaimsUserId(c)
+
 	return c.JSON(http.StatusOK, response.BaseResponse{
-		Code:    http.StatusOK,
+		Code:    userId,
 		Message: "Berhasil mendapatkan data user",
 		Data:    users,
 	})
