@@ -19,20 +19,35 @@ func NewUserUsecase(repo Repository, timeOut time.Duration) Usecase {
 }
 
 // core business login
-func (uc *UserUsecase) Login(ctx context.Context, email string, password string) (Domain, error) {
-	if email == "" {
+func (uc *UserUsecase) Login(ctx context.Context, domain Domain) (Domain, error) {
+	if domain.Email == "" {
 		return Domain{}, errors.New("email empty")
 	}
 
-	if password == "" {
+	if domain.Password == "" {
 		return Domain{}, errors.New("password empty")
 	}
 
-	user, err := uc.Repo.Login(ctx, email, password)
+	// var err error
+	// domain.Password, err = encrypt.Hash(domain.Password)
+	// if err != nil {
+	// 	return Domain{}, err
+	// }
+
+	user, err := uc.Repo.Login(ctx, domain.Email, domain.Password)
 
 	if err != nil {
 		return Domain{}, err
 	}
 
 	return user, nil
+}
+
+func (uc *UserUsecase) Register(ctx context.Context, userDomain *Domain) error {
+	err := uc.Repo.Register(ctx, userDomain)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

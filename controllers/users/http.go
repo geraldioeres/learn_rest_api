@@ -23,12 +23,12 @@ func NewUserController(userUseCase users.Usecase) *UserController {
 
 func (userController UserController) Login(c echo.Context) error {
 	fmt.Println("Login")
-	userLogin := requests.UserLogin{}
+	userLogin := requests.UserLogin{} 
 	c.Bind(&userLogin)
 
 	ctx := c.Request().Context()
 
-	user, error := userController.UserUseCase.Login(ctx, userLogin.Email, userLogin.Password)
+	user, error := userController.UserUseCase.Login(ctx, userLogin.ToDomain())
 
 	if error != nil {
 		return controllers.NewErrorResponse(c, http.StatusInternalServerError, error)

@@ -27,3 +27,14 @@ func (rep *MysqlUserRepository) Login(ctx context.Context, email string, passwor
 
 	return user.ToDomain(), nil
 }
+
+func (repository *MysqlUserRepository) Register(ctx context.Context, userDomain *users.Domain) error {
+	reg := FromDomain(*userDomain)
+
+	result := repository.Conn.Create(&reg)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}
